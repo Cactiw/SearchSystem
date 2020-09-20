@@ -3,7 +3,6 @@ import pymorphy2
 import string
 import json
 import re
-import multiprocessing
 
 import tqdm
 
@@ -13,20 +12,16 @@ PROCESS_NUM = 4
 
 
 def analyse_text(file) -> dict:
-    text_words = re.sub("[—{}]".format("".join(string.punctuation)), " ", file.read()).split()
+    text = re.sub("[—{}]".format("".join(string.punctuation)), " ", file.read())
     morph = pymorphy2.MorphAnalyzer()
+
     result = {}
 
-    with multiprocessing.Pool(PROCESS_NUM) as pool:
-        for normal_form in tqdm.tqdm(pool.imap_unordered(analyse_word, [(morph, word) for word in text_words]),
-                                     total=len(text_words)):
-            increase_or_add_value_to_dict(result, normal_form, 1)
+    for word in tqdm.tqdm(text.split()):
+        word = word.strip()
+        parsed = morph.parse(word)[0].normal_form
+        increase_or_add_value_to_dict(result, parsed, 1)
     return result
-
-
-def analyse_word(in_obj: list):
-    morph, word = in_obj
-    return morph.parse(word)[0].normal_form
 
 
 def main():
