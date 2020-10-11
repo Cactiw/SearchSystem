@@ -48,7 +48,7 @@ def normal_form(morph, word) -> str:
     return morph.parse(word)[0].normal_form
 
 
-def parse_input():
+def parse_input() -> dict:
     documents = {}
     words = {}
 
@@ -60,18 +60,22 @@ def parse_input():
             documents.update(res)
             merge_int_dictionaries(words, cur_words)
 
-    print(len(documents), len(words))
+    print("Processed {} documents with {} words".format(len(documents), len(words)))
     print("Calculating vectors...", flush=True)
+    vectors = {}
     for document, d_words in tqdm.tqdm(documents.items()):
         vector = []
         for word, df in words.items():
             value = math.log(d_words["words"].get(word, 0) + 1, 2) * math.log(len(documents) / df, 10)
             vector.append(value)
         vector = normalize(vector)
-        d_words.update({"vector": vector})
+        vectors.update({document: vector})
 
     save_dict(documents, "documents.json")
     save_dict(words, "words.json")
+    save_dict(vectors, "vectors.json")
+
+    return vectors
 
     # tf - вхождения слова в ЭТОТ документ
     # N - количество документов всего

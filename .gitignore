@@ -1,5 +1,6 @@
 output.json
 documents.json
 words.json
+vectors.json
 .idea/
 *.pyc
