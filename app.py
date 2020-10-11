@@ -24,7 +24,7 @@ def search():
         abort(400, "Empty request")
     result = perform_query(query)
     table = get_search_view(list(filter(lambda res: res.coefficient > 0, map(lambda x: SearchResult(*x), result))))
-    return render_template("search.html", table=table)
+    return render_template("search.html", table=table, current=query, title="{} - поиск".format(query))
 
 
 @app.route("/")

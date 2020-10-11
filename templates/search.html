@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" href="/static/css/table.css">
     <link rel="stylesheet" href="/static/css/input.css">
 </head>
@@ -12,7 +12,7 @@
     </div>
     <form action="search" method="get" class="upper-form">
         <p class="p-little">
-            <input type="search" name="query">
+            <input type="search" name="query" value="{{current}}">
             <input type="submit">
         </p>
     </form>
