@@ -6,4 +6,6 @@ def count_norm(vector: list) -> float:
 
 def normalize(vector: list) -> list:
     norm = count_norm(vector)
+    if norm == 0:
+        return vector
     return [(v / norm) for v in vector]
