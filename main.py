@@ -11,7 +11,7 @@ import json
 import tqdm
 
 from service.dict_service import increase_or_add_value_to_dict, merge_int_dictionaries, save_dict
-from service.vector_service import normalize, count_document_vector, count_norm
+from service.vector_service import normalize, count_document_vector, count_norm, cosine
 
 PROCESS_NUM = 4
 
@@ -101,6 +101,14 @@ def parse_input() -> (dict, dict, dict):
     # log2 (1 + tf) * log10 (N / df)
 
 
+def perform_query(vectors: dict, request: list) -> list:
+    result = []
+    for name, vector in vectors.items():
+        result.append([name, cosine(vector, request)])
+    result.sort(key=lambda x: x[1], reverse=True)
+    return result
+
+
 def main():
     documents, words, vectors = parse_input()
     requests = [
@@ -115,6 +123,8 @@ def main():
     print(count_norm(vector))
     print(vector)
 
+    result = perform_query(vectors, vector)
+    print(result)
 
 
 
