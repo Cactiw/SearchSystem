@@ -10,7 +10,7 @@ import unicodedata
 import tqdm
 
 from service.dict_service import increase_or_add_value_to_dict, merge_int_dictionaries, save_dict
-from service.vector_service import normalize
+from service.vector_service import normalize, count_document_vector
 
 PROCESS_NUM = 4
 
@@ -64,11 +64,7 @@ def parse_input() -> dict:
     print("Calculating vectors...", flush=True)
     vectors = {}
     for document, d_words in tqdm.tqdm(documents.items()):
-        vector = []
-        for word, df in words.items():
-            value = math.log(d_words["words"].get(word, 0) + 1, 2) * math.log(len(documents) / df, 10)
-            vector.append(value)
-        vector = normalize(vector)
+        vector = count_document_vector(d_words, words, len(documents))
         vectors.update({document: vector})
 
     save_dict(documents, "documents.json")
