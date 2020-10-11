@@ -4,6 +4,10 @@ from flask_cors import cross_origin, CORS
 
 from service.query_service import perform_query, analyse_text, count_document_vector
 
+from views.search_view import get_search_view
+
+from model.SearchResult import SearchResult
+
 from Resources import Resources
 
 app = Flask(__name__)
@@ -12,7 +16,9 @@ CORS(app)
 
 @app.route("/search/<query>")
 def search(query: str):
-    return str(perform_query(query))
+    result = perform_query(query)
+    table = get_search_view(list(filter(lambda res: res.coefficient > 0, map(lambda x: SearchResult(*x), result))))
+    return render_template("search.html", table=table)
 
 
 def run_app():

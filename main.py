@@ -1,7 +1,7 @@
 
 from service.query_service import parse_input
 
-from controller.app import run_app
+from app import run_app
 
 from Resources import Resources
 

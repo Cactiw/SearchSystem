@@ -3,3 +3,5 @@ pymorphy2-dicts-ru
 
 tqdm
 flask
+flask_cors
+flask_table
