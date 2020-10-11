@@ -10,6 +10,9 @@ from model.SearchResult import SearchResult
 
 from Resources import Resources
 
+from config import port
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -30,5 +33,5 @@ def index():
 
 
 def run_app():
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=port)
 
