@@ -14,11 +14,19 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/search/<query>")
-def search(query: str):
+@app.route("/search")
+def search():
+    query = request.args.get("query")
+    if not query:
+        abort(400, "Empty request")
     result = perform_query(query)
     table = get_search_view(list(filter(lambda res: res.coefficient > 0, map(lambda x: SearchResult(*x), result))))
     return render_template("search.html", table=table)
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 
 def run_app():
