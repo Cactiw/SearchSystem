@@ -18,10 +18,10 @@ th, td {
 
 tr:nth-child(odd) {background-color: #f2f2f2;}
 
-tr:hover {background-color: #93c8a3;}
+tr:hover {background-color: #79b0b1;}
 
 th {
-  background-color: #4caf50;
+  background-color: #3cabae;
   color: white;
 }
 
