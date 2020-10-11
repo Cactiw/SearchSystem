@@ -5,6 +5,7 @@ import re
 import os
 import glob
 import math
+import unicodedata
 
 import tqdm
 
@@ -17,6 +18,7 @@ PROCESS_NUM = 4
 def analyse_text(file) -> (dict, dict):
     text = file.read()
     text = re.sub("\\[.+?\\]", "", text)
+    text = remove_accents(text)
     morph = pymorphy2.MorphAnalyzer()
 
     result, total_words = {}, {}
@@ -35,6 +37,11 @@ def analyse_text(file) -> (dict, dict):
             "words": sent_words
         }})
     return result, total_words
+
+
+def remove_accents(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def normal_form(morph, word) -> str:
