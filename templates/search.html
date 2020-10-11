@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="/static/css/table.css">
+    <link rel="stylesheet" href="/static/css/input.css">
 </head>
 <body>
     <div class="header">
       <h1>Search results</h1>
     </div>
+    <form action="search" method="get" class="upper-form">
+        <p class="p-little">
+            <input type="search" name="query">
+            <input type="submit">
+        </p>
+    </form>
     {{ table }}
 </body>
 </html>
