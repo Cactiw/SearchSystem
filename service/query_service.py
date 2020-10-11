@@ -17,8 +17,8 @@ from service.dict_service import increase_or_add_value_to_dict, merge_int_dictio
 from service.vector_service import normalize, count_document_vector, count_norm, cosine
 
 
-def analyse_text(text) -> (dict, dict):
-    text = re.sub("\\[.+?\\]", "", text)
+def analyse_text(text_in) -> (dict, dict):
+    text = re.sub("\\[.+?\\]", "", text_in)
     text = remove_accents(text)
     morph = pymorphy2.MorphAnalyzer()
 
@@ -34,7 +34,7 @@ def analyse_text(text) -> (dict, dict):
         for word in words:
             increase_or_add_value_to_dict(sent_words, word, normalized_sentence.count(word))
             increase_or_add_value_to_dict(total_words, word, 1)
-        result.update({sentence: {
+        result.update({sentence.replace("\n", ""): {
             "words": sent_words
         }})
     return result, total_words
