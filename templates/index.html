@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Knyazev Search System</title>
+    <link rel="stylesheet" href="/static/css/input.css">
 </head>
 <body>
-    <form action="search" method="get">
-        <p>
-            <label for="query">Request</label>
-            <input type="text" name="query">
-        </p>
-        <p>
-            <input type="submit">
-        </p>
-    </form>
+    <div class="center">
+        <img src="/static/KSearch.png" alt="Paris" class="center-image">
+        <form action="search" method="get" class="center-form">
+            <p>
+<!--                <label for="query">Request</label>-->
+                <input type="search" name="query">
+            </p>
+            <p>
+                <input type="submit">
+            </p>
+        </form>
+    </div>
 </body>
 </html>
