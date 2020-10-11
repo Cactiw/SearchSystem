@@ -16,7 +16,7 @@ def normalize(vector: list) -> list:
 def count_document_vector(document: dict, words: dict, N: int):
     vector = []
     for word, df in words.items():
-        value = math.log(document["words"].get(word, 0) + 1, 2) * math.log(N / df, 10)
+        value = math.log(document.get(word, 0) + 1, 2) * math.log(N / df, 10)
         vector.append(value)
     vector = normalize(vector)
     return vector

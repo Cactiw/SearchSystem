@@ -6,17 +6,17 @@ import os
 import glob
 import math
 import unicodedata
+import json
 
 import tqdm
 
 from service.dict_service import increase_or_add_value_to_dict, merge_int_dictionaries, save_dict
-from service.vector_service import normalize, count_document_vector
+from service.vector_service import normalize, count_document_vector, count_norm
 
 PROCESS_NUM = 4
 
 
-def analyse_text(file) -> (dict, dict):
-    text = file.read()
+def analyse_text(text) -> (dict, dict):
     text = re.sub("\\[.+?\\]", "", text)
     text = remove_accents(text)
     morph = pymorphy2.MorphAnalyzer()
@@ -27,7 +27,7 @@ def analyse_text(file) -> (dict, dict):
 
     for sentence in tqdm.tqdm(sentences):
         sent_words = {}
-        normalized_words = list(map(lambda word: normal_form(morph, word.strip()), re.sub("[—{}\\n]".format("".join(string.punctuation)), " ", sentence).split()))
+        normalized_words = list(map(lambda word: normal_form(morph, word.strip()), re.sub("[—{}\\n«»]".format("".join(string.punctuation)), " ", sentence).split()))
         normalized_sentence = " ".join(normalized_words)
         words = set(normalized_words)
         for word in words:
@@ -48,7 +48,28 @@ def normal_form(morph, word) -> str:
     return morph.parse(word)[0].normal_form
 
 
-def parse_input() -> dict:
+def parse_input() -> (dict, dict, dict):
+    try:
+        f = open("documents.json", encoding="utf-8", mode='r')
+        documents = json.load(f)
+        f.close()
+
+        f = open("words.json", encoding="utf-8", mode='r')
+        words = json.load(f)
+        f.close()
+
+        f = open("vectors.json", encoding="utf-8", mode='r')
+        vectors = json.load(f)
+        f.close()
+
+        print("Cache files exist!")
+        return documents, words, vectors
+
+    except FileNotFoundError:
+        pass
+
+    print("Cache not found, generating now! (First launch)")
+
     documents = {}
     words = {}
 
@@ -56,7 +77,7 @@ def parse_input() -> dict:
         with open(os.path.join(os.getcwd(), filename), 'r', encoding="utf-8") as f:
             name = filename.partition("input\\")[2]
             print("Parsing {}".format(name))
-            res, cur_words = analyse_text(f)
+            res, cur_words = analyse_text(f.read())
             documents.update(res)
             merge_int_dictionaries(words, cur_words)
 
@@ -64,14 +85,14 @@ def parse_input() -> dict:
     print("Calculating vectors...", flush=True)
     vectors = {}
     for document, d_words in tqdm.tqdm(documents.items()):
-        vector = count_document_vector(d_words, words, len(documents))
+        vector = count_document_vector(d_words["words"], words, len(documents))
         vectors.update({document: vector})
 
     save_dict(documents, "documents.json")
     save_dict(words, "words.json")
     save_dict(vectors, "vectors.json")
 
-    return vectors
+    return documents, words, vectors
 
     # tf - вхождения слова в ЭТОТ документ
     # N - количество документов всего
@@ -81,7 +102,20 @@ def parse_input() -> dict:
 
 
 def main():
-    parse_input()
+    documents, words, vectors = parse_input()
+    requests = [
+        "Платоническая возлюбленная Огюста Конта вдохновила его на создание «религии человечества»",
+        "Рыбак, ударивший веслом по голове короля Гавайев, не был наказан, поскольку всего лишь защищался",
+        "Одна из мечетей в Крыму построена в честь неудачного покушения на императора"
+    ]
+    request = requests[0]
+
+    res, cur_words = analyse_text(request)
+    vector = count_document_vector(list(res.values())[0]["words"], words, len(documents))
+    print(count_norm(vector))
+    print(vector)
+
+
 
 
 if __name__ == "__main__":
