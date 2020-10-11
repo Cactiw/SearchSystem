@@ -1,0 +1,42 @@
+
+table {
+    border-collapse: collapse;
+    /*width: 50%;*/
+    margin: auto;
+    vertical-align: middle;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+tr:nth-child(odd) {background-color: #f2f2f2;}
+
+tr:hover {background-color: #93c8a3;}
+
+th {
+  background-color: #4caf50;
+  color: white;
+}
+
+.header {
+  padding: 30px;
+  text-align: center;
+  /*background: #1abc9c;*/
+  color: black;
+  font-size: 32px;
+}
+
+p {
+    padding: 30px;
+  text-align: center;
+  /*background: #1abc9c;*/
+  color: black;
+  font-size: 28px;
+}
