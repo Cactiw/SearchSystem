@@ -2,3 +2,4 @@ pymorphy2
 pymorphy2-dicts-ru
 
 tqdm
+flask
