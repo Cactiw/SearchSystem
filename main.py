@@ -8,8 +8,8 @@ import sys
 
 
 def main():
-    documents, words, vectors = parse_input()
-    Resources.set_resources(documents, words, vectors)
+    documents, words, vectors, max_words = parse_input()
+    Resources.set_resources(documents, words, vectors, max_words)
 
     for arg in sys.argv[1:]:
         if arg == "--files-only":
