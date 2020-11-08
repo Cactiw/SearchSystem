@@ -15,6 +15,7 @@ from Resources import Resources
 
 from service.dict_service import increase_or_add_value_to_dict, merge_int_dictionaries, save_dict
 from service.vector_service import normalize, count_document_vector, count_norm, cosine
+from service.language_model_service import count_probability
 
 
 def analyse_text(text_in, max_words) -> (dict, dict):
@@ -27,6 +28,7 @@ def analyse_text(text_in, max_words) -> (dict, dict):
     sentences = re.split(r' *[\.\?!][\'"\)\]]* *', text)
 
     for sentence in tqdm.tqdm(sentences):
+        count_words = 0
         sent_words = {}
         normalized_words = list(map(lambda word: normal_form(morph, word.strip()), re.sub("[—{}\\n«»]".format("".join(string.punctuation)), " ", sentence).split()))
         normalized_sentence = " ".join(normalized_words)
@@ -38,7 +40,7 @@ def analyse_text(text_in, max_words) -> (dict, dict):
             for cur_word in normalized_sentence.split():
                 if word == cur_word:
                     tf += 1
-
+                    count_words += 1
 
             # tf = normalized_sentence.count(word)
             increase_or_add_value_to_dict(sent_words, word, tf)
@@ -46,9 +48,11 @@ def analyse_text(text_in, max_words) -> (dict, dict):
             if tf > max_word:
                 max_words.update({word: tf})
 
-        result.update({sentence.replace("\n", ""): {
-            "words": sent_words
-        }})
+        if count_words > 0:
+            result.update({sentence.replace("\n", ""): {
+                "words": sent_words,
+                "total_words": count_words
+            }})
     return result, total_words
 
 
@@ -79,8 +83,10 @@ def parse_input() -> (dict, dict, dict, dict):
         max_words = json.load(f)
         f.close()
 
+        total_words = count_total_words(words)
+
         print("Cache files exist!")
-        return documents, words, vectors, max_words
+        return documents, words, vectors, max_words, total_words
 
     except FileNotFoundError:
         pass
@@ -112,7 +118,8 @@ def parse_input() -> (dict, dict, dict, dict):
     save_dict(vectors, "vectors.json")
     save_dict(max_words, "max_words.json")
 
-    return documents, words, vectors, max_words
+    total_words = count_total_words(words)
+    return documents, words, vectors, max_words, total_words
 
     # tf - вхождения слова в ЭТОТ документ
     # N - количество документов всего
@@ -122,14 +129,29 @@ def parse_input() -> (dict, dict, dict, dict):
     # tf * log (N / df)
 
 
+def count_total_words(words: dict) -> int:
+    total_words = 0
+    for word_dict in words.values():
+        total_words += word_dict.get("tf", 0)
+    return total_words
+
+
 def perform_query(request: str) -> list:
     documents, words, vectors, max_words = Resources.get_resources()
     res, cur_words = analyse_text(request, max_words)
-    request_vector = count_document_vector(list(res.values())[0]["words"], words, max_words, len(documents))
-
     result = []
-    for name, vector in vectors.items():
-        result.append([name, cosine(vector, request_vector)])
+
+    if Resources.USE_VECTOR:
+        # Векторная модель
+        request_vector = count_document_vector(list(res.values())[0]["words"], words, max_words, len(documents))
+
+        for name, vector in vectors.items():
+            result.append([name, cosine(vector, request_vector)])
+    else:
+        # Языковая модель
+        for doc_name, doc_data in documents.items():
+            result.append([doc_name, count_probability(doc_data, list(res.values())[0], Resources.LAMBDA)])
+
     result.sort(key=lambda x: x[1], reverse=True)
     return result
 

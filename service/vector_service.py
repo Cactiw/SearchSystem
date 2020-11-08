@@ -23,8 +23,6 @@ def count_document_vector(document: dict, words: dict, words_max: dict, N: int):
             second_value = 0.6 * (tf / words_max.get(word, 1))
             tf = (0.4 + second_value) if second_value else 0
 
-        # if word == "в":
-        #     print(word)
         value = tf * df.get("idf")  # tf * log (N / df)
         vector.append(value)
     vector = normalize(vector)
