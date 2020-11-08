@@ -1,6 +1,7 @@
 output.json
 documents.json
 words.json
+max_words.json
 vectors.json
 .idea/
 *.pyc
