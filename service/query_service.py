@@ -107,7 +107,7 @@ def parse_input() -> (dict, dict, dict, dict):
 
     print("Processed {} documents with {} words".format(len(documents), len(words)))
     print("Calculating vectors...", flush=True)
-    words = {k: {"tf": v, "idf": (v if not Resources.USE_SECOND else math.log(len(documents) / v))} for k, v in words.items()}
+    words = {k: {"tf": v, "idf": (1 / v if not Resources.USE_SECOND else math.log(len(documents) / v))} for k, v in words.items()}
     vectors = {}
     for document, d_words in tqdm.tqdm(documents.items()):
         vector = count_document_vector(d_words["words"], words, max_words, len(documents))
