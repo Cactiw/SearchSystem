@@ -144,7 +144,6 @@ def perform_query(request: str) -> list:
     if Resources.USE_VECTOR:
         # Векторная модель
         request_vector = count_document_vector(list(res.values())[0]["words"], words, max_words, len(documents))
-
         for name, vector in vectors.items():
             result.append([name, cosine(vector, request_vector)])
     else:
@@ -155,3 +154,21 @@ def perform_query(request: str) -> list:
     result.sort(key=lambda x: x[1], reverse=True)
     return result
 
+
+def count_dcg(l: list) -> float:
+    res = 0
+    print("Counting DCG of {}:".format(l))
+    for i, elem in enumerate(l):
+        res += elem / math.log(i + 1 + 1, 2)
+        print("+ {} / log2({})".format(elem, i + 1 + 1), end=" ")
+    print("\nDCG = {}".format(res))
+    return res
+
+
+# i_dcg = count_dcg([2, 1, 1, 0, 0, 0, 0, 0, 0, 0])
+# print(i_dcg)
+#
+# print(count_dcg([2, 1, 1, 0, 0, 0, 0, 0, 0, 0]) / i_dcg)
+# print(count_dcg([2, 0, 0, 1, 0, 0, 0, 0, 0, 0]) / i_dcg)
+# print(count_dcg([1, 1, 2, 1, 0, 1, 1, 0, 1, 0]) / i_dcg)
+# print(count_dcg([1, 1, 2, 1, 0, 1, 1, 0, 0, 0]) / i_dcg)
